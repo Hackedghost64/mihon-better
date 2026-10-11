@@ -64,7 +64,6 @@ import mihon.core.metro.GraphProvider
 import mihon.core.migration.Migration
 import mihon.core.migration.Migrator
 import mihon.telemetry.TelemetryConfig
-import org.conscrypt.Conscrypt
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.core.common.preference.Preference
 import tachiyomi.core.common.preference.PreferenceStore
@@ -136,9 +135,16 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
 
         GlobalExceptionHandler.initialize(applicationContext, CrashActivity::class.java)
 
-        // TLS 1.3 support for Android < 10
+        // TLS 1.3 support for Android < 10 (optional if Conscrypt is packaged)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            Security.insertProviderAt(Conscrypt.newProvider(), 1)
+            try {
+                val conscryptClass = Class.forName("org.conscrypt.Conscrypt")
+                val newProviderMethod = conscryptClass.getMethod("newProvider")
+                val provider = newProviderMethod.invoke(null) as java.security.Provider
+                Security.insertProviderAt(provider, 1)
+            } catch (_: Throwable) {
+                // Conscrypt not bundled; fallback to system security provider
+            }
         }
 
         setupNotificationChannels()

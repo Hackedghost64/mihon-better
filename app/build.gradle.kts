@@ -263,7 +263,6 @@ dependencies {
     // Networking
     implementation(libs.bundles.okhttp)
     implementation(libs.okio)
-    implementation(libs.conscrypt) // TLS 1.3 support for Android < 10
 
     // Data serialization (JSON, protobuf, xml)
     implementation(libs.bundles.serialization)
@@ -329,8 +328,7 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 
     // For detecting memory leaks; see https://square.github.io/leakcanary/
-    // debugImplementation(libs.leakCanary.android)
-    implementation(libs.leakCanary.plumber)
+    debugImplementation(libs.leakCanary.plumber)
 
     testImplementation(libs.kotlinx.coroutines.test)
 }
